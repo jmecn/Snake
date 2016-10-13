@@ -6,15 +6,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import javax.swing.JFrame;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.simsilica.es.EntityData;
 
 /**
- * ��Ϸ����
  * @author yanmaoyuan
  *
  */
@@ -28,7 +25,6 @@ public class Game {
 	private ScheduledExecutorService executor;
 	private ServiceRunnable serviceRunner;
 	private Timer timer;
-	private JFrame frame;
 	private List<Service> services = new ArrayList<Service>();
 	private EntityFactory factory;
 	
@@ -54,11 +50,6 @@ public class Game {
         return s;
     }
     
-    /**
-     * ��ѯ����
-     * @param type
-     * @return
-     */
 	@SuppressWarnings("unchecked")
 	public <T extends Service> T getService(Class<T> type) {
 		int len = services.size();
@@ -71,10 +62,6 @@ public class Game {
 		return null;
 	}
 	
-	/**
-	 * �Ƴ����
-	 * @param service
-	 */
 	public void removeService(Service service) {
 		if (services.contains(service)) {
 			service.terminate(this);
@@ -132,10 +119,6 @@ public class Game {
     
     public Timer getTimer() {
     	return timer;
-    }
-    
-    public JFrame getFrame() {
-    	return frame;
     }
     
     public EntityFactory getFactory() {

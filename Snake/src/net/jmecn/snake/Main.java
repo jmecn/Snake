@@ -11,7 +11,10 @@ public class Main extends SimpleApplication {
 	}
 	@Override
 	public void simpleInitApp() {
-		stateManager.attach(new EntityDataState());
+		Game game = new Game();
+		game.start();
+		
+		stateManager.attach(new GameState(game));
 	}
 
 	public static void main(String[] args) {

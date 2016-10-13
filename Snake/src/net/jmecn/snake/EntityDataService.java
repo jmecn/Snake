@@ -27,6 +27,7 @@ public class EntityDataService implements Service {
 
 	public void terminate(Game systems) {
 		ed.close();
+		ed = null;
 	}
 
 }

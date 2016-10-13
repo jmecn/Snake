@@ -5,7 +5,6 @@ import java.util.Set;
 import com.jme3.util.SafeArrayList;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityData;
-import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 
 /**
@@ -82,8 +81,10 @@ public class CollisionService implements Service {
 			if (distSq > threshold) {
 				return;
 			}
+			
+			System.out.println("eat foor : " + e1);
 
-			ed.removeEntity(e2.getId());
+			ed.removeEntity(e1.getId());
 		}
 	}
 

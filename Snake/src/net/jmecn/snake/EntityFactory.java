@@ -17,7 +17,7 @@ public class EntityFactory {
 		ed.setComponents(id,
 				new Position(location),
 				new Type(Type.FOOD),
-				new Collision(2));
+				new Collision(5));
 		return id;
 	}
 	
@@ -25,8 +25,19 @@ public class EntityFactory {
 		EntityId id = ed.createEntity();
 		ed.setComponents(id,
 				new Position(location),
-				new Type(Type.FOOD),
-				new Collision(2));
+				new Type(Type.BODY),
+				new Collision(20));
+		return id;
+	}
+	
+	public EntityId createBody(Vector3f location, EntityId parent) {
+		EntityId id = ed.createEntity();
+		ed.setComponents(id,
+				new Position(location),
+				new Type(Type.BODY),
+				new Collision(20),
+				new Follow(parent, 38)
+		);
 		return id;
 	}
 }
