@@ -1,4 +1,4 @@
-package net.jmecn.snake;
+package net.jmecn.snake.core;
 
 import com.simsilica.es.EntityData;
 import com.simsilica.es.base.DefaultEntityData;

@@ -1,4 +1,4 @@
-package net.jmecn.snake;
+package net.jmecn.snake.core;
 
 /**
  * ��Ϸ����ӿ�

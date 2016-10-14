@@ -1,5 +1,7 @@
 package net.jmecn.snake;
 
+import net.jmecn.snake.core.Game;
+
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.StatsAppState;
 

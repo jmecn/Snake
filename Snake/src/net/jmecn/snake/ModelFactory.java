@@ -1,11 +1,13 @@
 package net.jmecn.snake;
 
+import net.jmecn.snake.core.Collision;
+import net.jmecn.snake.core.Type;
+
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Spatial;
-import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Sphere;
 import com.simsilica.es.Entity;
 
@@ -39,20 +41,21 @@ public class ModelFactory {
 		
 		switch (type.getValue()) {
 		case Type.FOOD: {
-			float radius = collision == null ? 0.05f : collision.getRadius();
+			float radius = collision == null ? 6 : collision.getRadius();
 
-			Sphere sphere = new Sphere(6, 6, radius);
+			Sphere sphere = new Sphere(3, 5, radius);
 			Geometry geom = new Geometry("Food", sphere);
 
 			Material mat = getUnshadedMaterial();
-			mat.setColor("Color", ColorRGBA.Blue);
+			mat.setColor("Color", ColorRGBA.randomColor());
 			geom.setMaterial(mat);
 			return geom;
 		}
+		case Type.HEAD:
 		case Type.BODY: {
-			float radius = collision == null ? 0.05f : collision.getRadius();
+			float radius = collision == null ? 6 : collision.getRadius();
 
-			Sphere sphere = new Sphere(6, 6, radius);
+			Sphere sphere = new Sphere(3, 5, radius);
 			Geometry geom = new Geometry("Food", sphere);
 
 			Material mat = getUnshadedMaterial();

@@ -1,4 +1,4 @@
-package net.jmecn.snake;
+package net.jmecn.snake.core;
 
 import com.jme3.math.Vector3f;
 import com.simsilica.es.EntityData;
@@ -25,18 +25,20 @@ public class EntityFactory {
 		EntityId id = ed.createEntity();
 		ed.setComponents(id,
 				new Position(location),
-				new Type(Type.BODY),
+				new Type(Type.HEAD),
+				new Belongs(id),
 				new Collision(20));
 		return id;
 	}
 	
-	public EntityId createBody(Vector3f location, EntityId parent) {
+	public EntityId createBody(Vector3f location, EntityId parent, EntityId follow) {
 		EntityId id = ed.createEntity();
 		ed.setComponents(id,
 				new Position(location),
 				new Type(Type.BODY),
 				new Collision(20),
-				new Follow(parent, 38)
+				new Belongs(parent),
+				new Follow(follow, 40)
 		);
 		return id;
 	}

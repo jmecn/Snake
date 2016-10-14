@@ -4,12 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import net.jmecn.snake.core.Collision;
+import net.jmecn.snake.core.Position;
+import net.jmecn.snake.core.Type;
+
 import org.apache.log4j.Logger;
 
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.BaseAppState;
-import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
@@ -25,7 +28,6 @@ public class ModelState extends BaseAppState {
 	static Logger log = Logger.getLogger(ModelState.class);
 	
 	private SimpleApplication simpleApp;
-	private Camera cam;
 
 	private EntityData ed;
 	private EntitySet entities;
@@ -37,14 +39,18 @@ public class ModelState extends BaseAppState {
 
 	public ModelState() {
 		rootNode = new Node("VisualNode");
-		
 		models = new HashMap<EntityId, Spatial>();
 	}
 
 	@Override
 	protected void initialize(Application app) {
 		simpleApp = (SimpleApplication) app;
-
+		Camera cam = app.getCamera();
+		float x = cam.getWidth() * 0.5f;
+		float y = cam.getHeight() * 0.5f;
+		cam.setLocation(new Vector3f(x, y, 1000));
+		cam.lookAt(new Vector3f(x, y, 0), Vector3f.UNIT_Y);
+		
 		ed = getStateManager().getState(EntityDataState.class).getEntityData();
 		entities = ed.getEntities(Position.class, Type.class, Collision.class);
 
@@ -62,7 +68,7 @@ public class ModelState extends BaseAppState {
 
 	@Override
 	protected void onEnable() {
-		simpleApp.getGuiNode().attachChild(rootNode);
+		simpleApp.getRootNode().attachChild(rootNode);
 		entities.applyChanges();
 		addModels(entities);
 	}
@@ -73,6 +79,7 @@ public class ModelState extends BaseAppState {
 		removeModels(entities);
 	}
 
+	Vector3f camLoc = new Vector3f();
 	@Override
 	public void update(float tpf) {
 		if (entities.applyChanges()) {

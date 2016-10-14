@@ -1,4 +1,4 @@
-package net.jmecn.snake;
+package net.jmecn.snake.core;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +30,7 @@ public class Game {
 	
 	public Game() {
 		services.add(new EntityDataService());
+		services.add(new FollowService());
 		services.add(new MovementService());
 		services.add(new CollisionService());
 		services.add(new DecayService());
@@ -81,7 +82,7 @@ public class Game {
 		factory = new EntityFactory(getEntityData());
 		
 		executor = Executors.newScheduledThreadPool(1);
-		executor.scheduleAtFixedRate(serviceRunner, 0, 62, TimeUnit.MILLISECONDS);
+		executor.scheduleAtFixedRate(serviceRunner, 0, 10, TimeUnit.MILLISECONDS);
 		started = true;
 		
 		enabled = true;

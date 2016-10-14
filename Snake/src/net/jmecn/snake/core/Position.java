@@ -1,4 +1,4 @@
-package net.jmecn.snake;
+package net.jmecn.snake.core;
 
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
