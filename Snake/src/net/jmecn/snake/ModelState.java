@@ -18,6 +18,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.ui.Picture;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
@@ -48,7 +49,7 @@ public class ModelState extends BaseAppState {
 		Camera cam = app.getCamera();
 		float x = cam.getWidth() * 0.5f;
 		float y = cam.getHeight() * 0.5f;
-		cam.setLocation(new Vector3f(x, y, 1000));
+		cam.setLocation(new Vector3f(x, y, 500));
 		cam.lookAt(new Vector3f(x, y, 0), Vector3f.UNIT_Y);
 		
 		ed = getStateManager().getState(EntityDataState.class).getEntityData();
@@ -57,6 +58,10 @@ public class ModelState extends BaseAppState {
 		simpleApp.getViewPort().setBackgroundColor(new ColorRGBA(0.75f, 0.875f, 1f, 1f));
 
 		modelFactory = new ModelFactory(simpleApp.getAssetManager());
+		
+		Spatial bg = modelFactory.createBackground();
+		simpleApp.getRootNode().attachChild(bg);
+		
 	}
 
 	@Override
@@ -83,7 +88,6 @@ public class ModelState extends BaseAppState {
 	@Override
 	public void update(float tpf) {
 		if (entities.applyChanges()) {
-			log.info("Model Counts: " + entities.size());
 			removeModels(entities.getRemovedEntities());
 			addModels(entities.getAddedEntities());
 			updateModels(entities.getChangedEntities());

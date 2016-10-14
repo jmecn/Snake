@@ -1,6 +1,7 @@
 package net.jmecn.snake;
 
 import net.jmecn.snake.core.Position;
+import net.jmecn.snake.core.SnakeConstants;
 import net.jmecn.snake.core.Velocity;
 
 import com.jme3.app.Application;
@@ -112,7 +113,7 @@ public class HudState extends BaseAppState implements ActionListener {
 			Vector3f linear = target.subtract(realCenter).normalize();
 			btnNode.setLocalTranslation(controlCenter.add(linear.mult(50)));
 			
-			linear.multLocal(200);
+			linear.multLocal(SnakeConstants.speed);
 			
 			ed.setComponent(player, new Velocity(linear));
 		} else {
@@ -120,7 +121,7 @@ public class HudState extends BaseAppState implements ActionListener {
 		}
 		
 		Vector3f loc = ed.getComponent(player, Position.class).getLocation();
-		cam.setLocation(new Vector3f(loc.x, loc.y, 1000));
+		cam.setLocation(new Vector3f(loc.x, loc.y, 200));
 	}
 
 }

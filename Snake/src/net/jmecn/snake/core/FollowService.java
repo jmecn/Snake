@@ -36,7 +36,7 @@ public class FollowService implements Service {
 				Vector3f linear = loc2.subtract(loc1).normalize();
 				
 				// TODO use a speed component
-				linear.multLocal(200);
+				linear.multLocal(SnakeConstants.speed);
 				ed.setComponents(e.getId(), new Velocity(linear));
 			}
 		}

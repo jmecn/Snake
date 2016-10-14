@@ -1,5 +1,7 @@
 package net.jmecn.snake.core;
 
+import org.apache.log4j.Logger;
+
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
@@ -12,7 +14,8 @@ import com.simsilica.es.filter.FieldFilter;
  * 
  */
 public class CollisionService implements Service {
-
+	static Logger log = Logger.getLogger(CollisionService.class);
+	
 	private EntityData ed;
 	private EntitySet bodys;
 	private EntitySet heads;
@@ -58,7 +61,7 @@ public class CollisionService implements Service {
 		for(Entity food : foods) {
 			for(Entity head : heads) {
 				if (collision(food, head)) {
-					System.out.println(head.getId() + "eat " + food.getId());
+					log.info(head.getId() + " eat " + food.getId());
 					ed.removeEntity(food.getId());
 				}
 			}
@@ -75,7 +78,7 @@ public class CollisionService implements Service {
 				
 				// 身体相撞
 				if (collision(body, head)) {
-					System.out.println(head.getId() + " dead");
+					log.info(head.getId() + " dead");
 					//ed.removeEntity(head.getId());
 				}
 			}

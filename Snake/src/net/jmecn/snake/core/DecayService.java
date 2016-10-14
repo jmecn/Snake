@@ -1,7 +1,6 @@
 package net.jmecn.snake.core;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityData;
@@ -14,7 +13,7 @@ import com.simsilica.es.EntitySet;
  */
 public class DecayService implements Service {
 
-	static Logger log = LoggerFactory.getLogger(DecayService.class);
+	static Logger log = Logger.getLogger(DecayService.class);
 
 	private EntityData ed;
 	private EntitySet decaying;

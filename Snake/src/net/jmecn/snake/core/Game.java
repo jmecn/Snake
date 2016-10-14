@@ -33,6 +33,7 @@ public class Game {
 		services.add(new FollowService());
 		services.add(new MovementService());
 		services.add(new CollisionService());
+		services.add(new BoundrayService());
 		services.add(new DecayService());
 		
 		timer = new Timer();
