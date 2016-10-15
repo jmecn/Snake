@@ -106,6 +106,8 @@ public class HudState extends BaseAppState implements ActionListener {
 	}
 	
 	public void update(float tpf) {
+		if (player == null) return;
+		
 		if (isMoving) {
 			Vector2f loc = this.getApplication().getInputManager().getCursorPosition();
 			Vector3f target = new Vector3f(loc.x, loc.y, 0);
@@ -120,8 +122,11 @@ public class HudState extends BaseAppState implements ActionListener {
 			btnNode.setLocalTranslation(controlCenter);
 		}
 		
-		Vector3f loc = ed.getComponent(player, Position.class).getLocation();
-		cam.setLocation(new Vector3f(loc.x, loc.y, 200));
+		Position p = ed.getComponent(player, Position.class);
+		if (p != null) {
+			Vector3f loc = p.getLocation();
+			cam.setLocation(new Vector3f(loc.x, loc.y, 400));
+		}
 	}
 
 }

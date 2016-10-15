@@ -55,34 +55,15 @@ public class MovementService implements Service {
 
 			Vector3f loc = pos.getLocation();
 			Vector3f linear = vel.getLinear();
-			loc = loc.add((float) (linear.x * tpf), (float) (linear.y * tpf), (float) (linear.z * tpf));
+			loc = loc.add((float) (linear.x * tpf), (float) (linear.y * tpf), 0);
 
-			// A little quaternion magic for adding rotational
-			// velocity to orientation
-			Quaternion orientation = pos.getFacing();
-			orientation = addScaledVector(orientation, vel.getAngular(), tpf);
-			orientation.normalizeLocal();
-
-			e.set(new Position(loc, orientation));
+			// 让模型的脸朝向线速度的方向
+			Vector3f y = linear.normalize();
+			Vector3f x = new Vector3f(y.y, -y.x, 0);
+			Quaternion a = new Quaternion().fromAxes(x, y, Vector3f.UNIT_Z);
+			
+			e.set(new Position(loc, a));
 		}
-	}
-
-	private Quaternion addScaledVector(Quaternion orientation, Vector3f v, float scale) {
-
-		float x = orientation.getX();
-		float y = orientation.getY();
-		float z = orientation.getZ();
-		float w = orientation.getW();
-
-		Quaternion q = new Quaternion( v.x * scale,  v.y * scale,  v.z * scale, 0);
-		q.multLocal(orientation);
-
-		x = x + q.getX() * 0.5f;
-		y = y + q.getY() * 0.5f;
-		z = z + q.getZ() * 0.5f;
-		w = w + q.getW() * 0.5f;
-
-		return new Quaternion((float) x, (float) y, (float) z, (float) w);
 	}
 
 }

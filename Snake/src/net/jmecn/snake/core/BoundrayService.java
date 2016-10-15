@@ -23,7 +23,7 @@ public class BoundrayService implements Service {
 				Vector3f loc = e.get(Position.class).getLocation();
 				
 				if (loc.x < min.x || loc.x> max.x || loc.y<min.y || loc.y > max.y) {
-					e.set(new Decay(0));
+					e.set(new Dead());
 				}
 			}
 		}

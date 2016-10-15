@@ -24,18 +24,20 @@ public class FollowService implements Service {
 			Follow follow = e.get(Follow.class);
 			EntityId parent = follow.getParent();
 			float maxDist = follow.getDist();
+			
 			Position position = e.get(Position.class);
 			Position parentPosition = ed.getComponent(parent, Position.class);
 			
 			Vector3f loc1 = position.getLocation();
 			Vector3f loc2 = parentPosition.getLocation();
-			
-			maxDist *= maxDist;
-			float dist = loc1.distanceSquared(loc2);
-			if (dist > maxDist) {
-				Vector3f linear = loc2.subtract(loc1).normalize();
+	        double dx = loc2.x - loc1.x;
+	        double dy = loc2.y - loc1.y;
+	        float distSquared = (float) (dx * dx + dy * dy);
+	        
+	        
+			if (distSquared > maxDist * maxDist) {
+				Vector3f linear = new Vector3f((float)dx, (float)dy, 0f).normalize();
 				
-				// TODO use a speed component
 				linear.multLocal(SnakeConstants.speed);
 				ed.setComponents(e.getId(), new Velocity(linear));
 			}

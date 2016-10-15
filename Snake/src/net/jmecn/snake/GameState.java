@@ -1,6 +1,7 @@
 package net.jmecn.snake;
 
 import net.jmecn.snake.core.Game;
+import net.jmecn.snake.core.SnakeConstants;
 import net.jmecn.snake.core.Tail;
 
 import com.jme3.app.Application;
@@ -12,7 +13,6 @@ public class GameState extends BaseAppState {
 
 	private Game game;
 	private EntityId player;
-	private EntityId tail;// 尾巴
 
 	public GameState(Game game) {
 		this.game = game;
@@ -21,13 +21,14 @@ public class GameState extends BaseAppState {
 			game.getFactory().createFood();
 		}
 
-		Vector3f loc = new Vector3f(512, 384, 0);
-		player = game.getFactory().createHead(loc);
-		for (int i = 0; i < 5; i++) {
+		Vector3f loc = new Vector3f(SnakeConstants.width/2, SnakeConstants.height/2, 0);
+		player = game.getFactory().createHead(loc, 1);
+		EntityId tail = null;
+		for (int i = 0; i < SnakeConstants.snakeMinLength; i+= 6) {
 			if (tail == null) {
-				tail = game.getFactory().createBody(loc, player, player);
+				tail = game.getFactory().createBody(loc, 1, player, player);
 			} else {
-				tail = game.getFactory().createBody(loc, player, tail);
+				tail = game.getFactory().createBody(loc, 1, player, tail);
 			}
 		}
 		game.getEntityData().setComponent(player, new Tail(tail));

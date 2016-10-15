@@ -16,6 +16,8 @@ import com.simsilica.es.filter.FieldFilter;
 public class CollisionService implements Service {
 	static Logger log = Logger.getLogger(CollisionService.class);
 	
+	private Game game = null;
+	
 	private EntityData ed;
 	private EntitySet bodys;
 	private EntitySet heads;
@@ -24,6 +26,7 @@ public class CollisionService implements Service {
 	@Override
 	public void initialize(Game game) {
 		ed = game.getEntityData();
+		this.game = game;
 		
 		foods = ed.getEntities(
 				new FieldFilter<Type>(Type.class, "value", Type.FOOD),
@@ -61,8 +64,26 @@ public class CollisionService implements Service {
 		for(Entity food : foods) {
 			for(Entity head : heads) {
 				if (collision(food, head)) {
-					log.info(head.getId() + " eat " + food.getId());
+					Length len = ed.getComponent(head.getId(), Length.class);
+					int value = len.getValue() + 1;
+					ed.setComponent(head.getId(), new Length(value));
+					
+					
+					if (value % SnakeConstants.snakeBodyGrow == 0) {
+						Tail tail = ed.getComponent(head.getId(), Tail.class);
+						log.info(tail);
+						
+						Position p = ed.getComponent(tail.getId(), Position.class);
+						log.info(p);
+						
+						int skin = head.get(Type.class).getSkin();
+						EntityId newTail = game.getFactory().createBody(p.getLocation(), skin, head.getId(), tail.getId());
+						ed.setComponent(head.getId(), new Tail(newTail));
+						log.info("create new tail" + newTail + " with skin: " + skin);
+					}
+					
 					ed.removeEntity(food.getId());
+					game.getFactory().createFood();
 				}
 			}
 		}
@@ -79,41 +100,20 @@ public class CollisionService implements Service {
 				// 身体相撞
 				if (collision(body, head)) {
 					log.info(head.getId() + " dead");
-					//ed.removeEntity(head.getId());
+					head.set(new Dead());
+					
 				}
 			}
 		}
 		
 	}
 
-	protected void generateContacts(Entity e1, Entity e2) {
-		if (e1 == e2)
-			return;
-		
-		// 身体相撞
-		EntityId p1 = ed.getComponent(e1.getId(), Belongs.class).getParent();
-		EntityId p2 = ed.getComponent(e2.getId(), Belongs.class).getParent();
-		
-		if (p1 == p2) {
-			return ;
-		}
-		
-		Follow f1 = ed.getComponent(e1.getId(), Follow.class);
-		Follow f2 = ed.getComponent(e2.getId(), Follow.class);
-		
-		if (f1 == null && f2 != null) {
-			// e1 is head
-			if (collision(e1, e2)) {
-				System.out.println(e1.getId() + " dead");
-			}
-		} else if (f2 == null && f1 != null){
-			// e2 is head
-			if (collision(e1, e2)) {
-				System.out.println(e2.getId() + " dead");
-			}
-		}
-	}
-	
+	/**
+	 * 碰撞检测
+	 * @param e1
+	 * @param e2
+	 * @return
+	 */
 	private boolean collision(Entity e1, Entity e2) {
 		Position p1 = e1.get(Position.class);
 		Position p2 = e2.get(Position.class);

@@ -18,7 +18,6 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.ui.Picture;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
@@ -55,7 +54,7 @@ public class ModelState extends BaseAppState {
 		ed = getStateManager().getState(EntityDataState.class).getEntityData();
 		entities = ed.getEntities(Position.class, Type.class, Collision.class);
 
-		simpleApp.getViewPort().setBackgroundColor(new ColorRGBA(0.75f, 0.875f, 1f, 1f));
+		simpleApp.getViewPort().setBackgroundColor(new ColorRGBA(0.7f, 0.05f, 0.04f, 1f));
 
 		modelFactory = new ModelFactory(simpleApp.getAssetManager());
 		
