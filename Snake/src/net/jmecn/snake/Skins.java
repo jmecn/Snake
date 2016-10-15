@@ -10,6 +10,12 @@ public class Skins {
 			new Vector3f(1.828f, 1.25f, 1),
 			new Vector3f(1, 1, 1),
 			new Vector3f(1, 1, 1));
+	public static Skins RED = new Skins(0, "skin_9_head.png",
+			"skin_9_body.png",
+			"skin_9_tail.png",
+			new Vector3f(1.147f, 1, 1),
+			new Vector3f(1, 1, 1),
+			new Vector3f(1, 1, 1));
 	
 	int value;
 	String head;

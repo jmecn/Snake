@@ -49,7 +49,7 @@ public class EntityFactory {
 				new Type(Type.BODY, skin),
 				new Collision(SnakeConstants.snakeBodyRadius),
 				new Belongs(parent),
-				new Follow(follow, SnakeConstants.snakeBodyRadius)
+				new Follow(follow, SnakeConstants.snakeBodyRadius * 1.4f)
 		);
 		return id;
 	}

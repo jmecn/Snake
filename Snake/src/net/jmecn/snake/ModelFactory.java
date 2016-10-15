@@ -57,18 +57,18 @@ public class ModelFactory {
 			if (type.getSkin() == -1) {
 				return createFood(radius);
 			} else {
-				return createBody(radius, Skins.BEE.body);
+				return createBody(radius, Skins.RED.body);
 			}
 		}
 		case Type.HEAD: {
 			float radius = collision == null ? SnakeConstants.snakeBodyRadius : collision.getRadius();
 			int skin = type.getSkin();
-			return createBody(radius, Skins.BEE.head, Skins.BEE.headScale);
+			return createBody(radius, Skins.RED.head, Skins.RED.headScale);
 		}
 		case Type.BODY: {
 			float radius = collision == null ? SnakeConstants.snakeBodyRadius : collision.getRadius();
 			int skin = type.getSkin();
-			return createBody(radius, Skins.BEE.body, Skins.BEE.bodyScale);
+			return createBody(radius, Skins.RED.body, Skins.RED.bodyScale);
 		}
 		default:
 			return null;

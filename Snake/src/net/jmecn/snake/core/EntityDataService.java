@@ -5,16 +5,16 @@ import com.simsilica.es.base.DefaultEntityData;
 
 public class EntityDataService implements Service {
 
-	private EntityData ed;
+	private DefaultEntityData ed;
 
 	public EntityDataService() {
 	}
 
-	public EntityData getEntityData() {
+	public DefaultEntityData getEntityData() {
 		return ed;
 	}
 
-	protected EntityData createEntityData() {
+	protected DefaultEntityData createEntityData() {
 		return new DefaultEntityData();
 	}
 

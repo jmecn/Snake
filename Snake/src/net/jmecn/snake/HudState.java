@@ -125,7 +125,7 @@ public class HudState extends BaseAppState implements ActionListener {
 		Position p = ed.getComponent(player, Position.class);
 		if (p != null) {
 			Vector3f loc = p.getLocation();
-			cam.setLocation(new Vector3f(loc.x, loc.y, 400));
+			cam.setLocation(new Vector3f(loc.x, loc.y, 300));
 		}
 	}
 
