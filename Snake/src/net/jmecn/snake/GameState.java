@@ -39,7 +39,8 @@ public class GameState extends BaseAppState {
 		getStateManager().attachAll(
 				new EntityDataState(game.getEntityData()),
 				new ModelState(),
-				new HudState(player));
+				new HudState(player),
+				new MusicState());
 	}
 
 	@Override

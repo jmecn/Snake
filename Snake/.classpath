@@ -10,5 +10,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/slf4j"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/zay-es"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/jme3-networking"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/jme3-jogg"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
