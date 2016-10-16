@@ -1,5 +1,6 @@
 package net.jmecn.snake;
 
+import static net.jmecn.snake.core.SnakeConstants.*;
 import net.jmecn.snake.core.Collision;
 import net.jmecn.snake.core.SnakeConstants;
 import net.jmecn.snake.core.Type;
@@ -8,11 +9,15 @@ import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Quad;
+import com.jme3.texture.Texture;
+import com.jme3.texture.Texture.WrapMode;
 import com.simsilica.es.Entity;
 
 /**
@@ -35,16 +40,11 @@ public class ModelFactory {
 		return assetManager.loadModel(name);
 	}
 	
-	public Spatial createBackground() {
-		Geometry geom = new Geometry("BG", new Quad(SnakeConstants.width, SnakeConstants.height));
-		Material mat = getUnshadedMaterial();
-		mat.setTexture("ColorMap", assetManager.loadTexture("Interface/background.png"));
-		geom.setMaterial(mat);
-		return geom;
-	}
-
 	public Material getUnshadedMaterial() {
-		return new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+		Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+		mat.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
+		mat.setFloat("AlphaDiscardThreshold", 0.01f);
+		return mat;
 	}
 
 	public Spatial create(Entity e) {
@@ -57,18 +57,18 @@ public class ModelFactory {
 			if (type.getSkin() == -1) {
 				return createFood(radius);
 			} else {
-				return createBody(radius, Skins.RED.body);
+				return createBody(radius, Skins.BEE.body);
 			}
 		}
 		case Type.HEAD: {
 			float radius = collision == null ? SnakeConstants.snakeBodyRadius : collision.getRadius();
 			int skin = type.getSkin();
-			return createBody(radius, Skins.RED.head, Skins.RED.headScale);
+			return createBody(radius, Skins.BEE.head, Skins.BEE.headScale);
 		}
 		case Type.BODY: {
 			float radius = collision == null ? SnakeConstants.snakeBodyRadius : collision.getRadius();
 			int skin = type.getSkin();
-			return createBody(radius, Skins.RED.body, Skins.RED.bodyScale);
+			return createBody(radius, Skins.BEE.body, Skins.BEE.bodyScale);
 		}
 		default:
 			return null;
@@ -82,9 +82,9 @@ public class ModelFactory {
 		Material mat = getUnshadedMaterial();
 		mat.setTexture("ColorMap", assetManager.loadTexture("Interface/circle.png"));
 		mat.setColor("Color", ColorRGBA.randomColor());
-		mat.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
 		
 		geom.setMaterial(mat);
+		geom.setQueueBucket(Bucket.Translucent);
 		
 		Node node = new Node("food");
 		node.attachChild(geom);
@@ -104,12 +104,27 @@ public class ModelFactory {
 
 		Material mat = getUnshadedMaterial();
 		mat.setTexture("ColorMap", assetManager.loadTexture("Interface/Skin/" + imgName));
-		mat.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
 		geom.setMaterial(mat);
+		geom.setQueueBucket(Bucket.Translucent);
 		
 		Node node = new Node("body");
 		node.attachChild(geom);
 		geom.setLocalTranslation(-radius * scale.x, -radius * scale.y, 0);
 		return node;
+	}
+	
+	public Spatial createBackground() {
+		Quad mesh = new Quad(width, height);
+		mesh.scaleTextureCoordinates(new Vector2f(width/UNIT, height/UNIT));
+		Geometry geom = new Geometry("BG", mesh);
+		Material mat = getUnshadedMaterial();
+		
+		Texture tex = assetManager.loadTexture("Interface/tile.png");
+		tex.setWrap(WrapMode.Repeat);
+		mat.setTexture("ColorMap", tex);
+		
+		geom.setMaterial(mat);
+		geom.setQueueBucket(Bucket.Translucent);
+		return geom;
 	}
 }

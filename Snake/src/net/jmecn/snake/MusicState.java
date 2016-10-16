@@ -109,7 +109,6 @@ public class MusicState extends BaseAppState
 
     @Override
     protected void initialize(Application app) {
-    	setSong("Sounds/bg.ogg");
     }
 
     @Override

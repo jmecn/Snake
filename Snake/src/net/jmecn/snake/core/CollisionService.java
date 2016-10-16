@@ -2,6 +2,7 @@ package net.jmecn.snake.core;
 
 import org.apache.log4j.Logger;
 
+import com.jme3.math.Vector3f;
 import com.simsilica.es.Entity;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
@@ -63,11 +64,11 @@ public class CollisionService implements Service {
 		// eat food
 		for(Entity food : foods) {
 			for(Entity head : heads) {
-				if (collision(food, head)) {
+				float delta = collision(food, head);
+				if (delta < 0) {
 					Length len = ed.getComponent(head.getId(), Length.class);
 					int value = len.getValue() + 1;
 					ed.setComponent(head.getId(), new Length(value));
-					
 					
 					if (value % SnakeConstants.snakeBodyGrow == 0) {
 						Tail tail = ed.getComponent(head.getId(), Tail.class);
@@ -84,6 +85,14 @@ public class CollisionService implements Service {
 					
 					ed.removeEntity(food.getId());
 					game.getFactory().createFood();
+				} else if (delta >0 && delta <= SnakeConstants.foodMovingDistance) {
+					// 蛇头吸附附近的食物
+					Position p1 = food.get(Position.class);
+					Position p2 = head.get(Position.class);
+					Vector3f linear = p2.getLocation().subtract(p1.getLocation()).normalize();
+					linear.multLocal(SnakeConstants.speed);
+					
+					food.set(new Velocity(linear));
 				}
 			}
 		}
@@ -98,7 +107,7 @@ public class CollisionService implements Service {
 					continue;
 				
 				// 身体相撞
-				if (collision(body, head)) {
+				if (collision(body, head) < 0) {
 					log.info(head.getId() + " dead");
 					head.set(new Dead());
 					
@@ -114,7 +123,7 @@ public class CollisionService implements Service {
 	 * @param e2
 	 * @return
 	 */
-	private boolean collision(Entity e1, Entity e2) {
+	private float collision(Entity e1, Entity e2) {
 		Position p1 = e1.get(Position.class);
 		Position p2 = e2.get(Position.class);
 
@@ -128,7 +137,7 @@ public class CollisionService implements Service {
 
 		float distSq = p1.getLocation().distanceSquared(p2.getLocation());
 		
-		return distSq <= threshold;
+		return distSq - threshold;
 	}
 	
 }

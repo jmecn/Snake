@@ -54,11 +54,12 @@ public class ModelState extends BaseAppState {
 		ed = getStateManager().getState(EntityDataState.class).getEntityData();
 		entities = ed.getEntities(Position.class, Type.class, Collision.class);
 
-		simpleApp.getViewPort().setBackgroundColor(new ColorRGBA(0.7f, 0.05f, 0.04f, 1f));
+		simpleApp.getViewPort().setBackgroundColor(new ColorRGBA(0.9179f, 0.9213f, 0.9345f, 1f));
 
 		modelFactory = new ModelFactory(simpleApp.getAssetManager());
 		
 		Spatial bg = modelFactory.createBackground();
+		bg.move(0, 0, -3);
 		simpleApp.getRootNode().attachChild(bg);
 		
 	}
