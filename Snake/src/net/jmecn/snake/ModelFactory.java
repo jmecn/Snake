@@ -40,6 +40,10 @@ public class ModelFactory {
 		return assetManager.loadModel(name);
 	}
 	
+	public Texture createTexture(String name) {
+		return assetManager.loadTexture(name);
+	}
+	
 	public Material getUnshadedMaterial() {
 		Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
 		mat.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
@@ -75,12 +79,12 @@ public class ModelFactory {
 		}
 	}
 	
-	private Spatial createFood(float radius) {
+	public Spatial createFood(float radius) {
 		Quad mesh = new Quad(radius*2, radius*2);
 		Geometry geom = new Geometry("Food", mesh);
 
 		Material mat = getUnshadedMaterial();
-		mat.setTexture("ColorMap", assetManager.loadTexture("Interface/circle.png"));
+		mat.setTexture("ColorMap", createTexture("Interface/circle.png"));
 		mat.setColor("Color", ColorRGBA.randomColor());
 		
 		geom.setMaterial(mat);
@@ -92,18 +96,18 @@ public class ModelFactory {
 		return node;
 	}
 	
-	protected Spatial createBody(float radius, String imgName) {
+	public Spatial createBody(float radius, String imgName) {
 		return createBody(radius, imgName, Vector3f.UNIT_XYZ);
 	}
 	
-	private Spatial createBody(float radius, String imgName, Vector3f scale) {
+	public Spatial createBody(float radius, String imgName, Vector3f scale) {
 		float width = radius * 2 * scale.x;
 		float height = radius * 2 * scale.y;
 		Quad mesh = new Quad(width, height);
 		Geometry geom = new Geometry("body", mesh);
 
 		Material mat = getUnshadedMaterial();
-		mat.setTexture("ColorMap", assetManager.loadTexture("Interface/Skin/" + imgName));
+		mat.setTexture("ColorMap", createTexture("Interface/Skin/" + imgName));
 		geom.setMaterial(mat);
 		geom.setQueueBucket(Bucket.Translucent);
 		
@@ -119,7 +123,7 @@ public class ModelFactory {
 		Geometry geom = new Geometry("BG", mesh);
 		Material mat = getUnshadedMaterial();
 		
-		Texture tex = assetManager.loadTexture("Interface/tile.png");
+		Texture tex = createTexture("Interface/tile.png");
 		tex.setWrap(WrapMode.Repeat);
 		mat.setTexture("ColorMap", tex);
 		

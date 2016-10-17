@@ -98,8 +98,8 @@ public class MusicState extends BaseAppState
             || !Objects.equal(song, playing) ) {
             
             AssetManager assets = getApplication().getAssetManager();
-            music = new AudioNode(assets, song, DataType.Buffer);            
-            music.setReverbEnabled(false);            
+            music = new AudioNode(assets, song, DataType.Buffer);
+            music.setReverbEnabled(false);
             music.setPositional(false);
             music.setVolume(volume);
             music.play();

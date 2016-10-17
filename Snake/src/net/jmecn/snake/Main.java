@@ -15,11 +15,12 @@ public class Main extends SimpleApplication {
 	public Main() {
 		super(new StatsAppState());
 	}
+	
 	@Override
 	public void simpleInitApp() {
-		stateManager.attachAll(new MusicState());
+		stateManager.attachAll(new MusicState(), new MainMenuState());
 		
-		startSingleGame();
+		//startSingleGame();
 	}
 	
 	public void startSingleGame() {
@@ -51,6 +52,7 @@ public class Main extends SimpleApplication {
 
 	public static void main(String[] args) {
 		Main app = new Main();
+		app.setPauseOnLostFocus(false);
 		app.start();
 	}
 }
