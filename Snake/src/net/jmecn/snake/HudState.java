@@ -1,5 +1,7 @@
 package net.jmecn.snake;
 
+import org.apache.log4j.Logger;
+
 import net.jmecn.snake.core.Length;
 import net.jmecn.snake.core.Position;
 import net.jmecn.snake.core.SnakeConstants;
@@ -18,16 +20,23 @@ import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
 import com.jme3.ui.Picture;
+import com.jme3.util.TempVars;
 import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
 
 public class HudState extends BaseAppState implements ActionListener {
 
+	static Logger log = Logger.getLogger(HudState.class);
+	
+	public final static String MOVING = "moving";
+	public final static String SPEEDUP = "speedup";
+	
 	private EntityData ed;
 	private EntityId player;
 	private boolean isMoving = false;
@@ -54,7 +63,6 @@ public class HudState extends BaseAppState implements ActionListener {
 	private BitmapFont hudFont;
 	private BitmapText lengthTxt;
 	private BitmapText killTxt;
-	private boolean dirty = true;
 	
 	public HudState(EntityId player) {
 		this.player = player;
@@ -119,8 +127,8 @@ public class HudState extends BaseAppState implements ActionListener {
 		realCenter.multLocal(scalar, scalar, 1f);
 		
 		InputManager inputManager = app.getInputManager();
-		inputManager.addMapping("Mouse", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
-		inputManager.addListener(this, "Mouse");
+		inputManager.addMapping(MOVING, new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+		inputManager.addListener(this, MOVING);
 	}
 
 	@Override
@@ -139,23 +147,46 @@ public class HudState extends BaseAppState implements ActionListener {
 
 	@Override
 	public void onAction(String name, boolean isPressed, float tpf) {
-		if (name.equals("Mouse")) {
+		if (name.equals(MOVING)) {
 			this.isMoving = isPressed;
 		}
 	}
 	
 	public void update(float tpf) {
+		
 		// 方向舵
 		if (isMoving) {
 			Vector2f loc = this.getApplication().getInputManager().getCursorPosition();
 			Vector3f target = new Vector3f(loc.x, loc.y, 0);
 			
-			Vector3f linear = target.subtract(realCenter).normalize();
-			dirControlButton.setLocalTranslation(controlCenter.add(linear.mult(50)));
+			Vector3f dir = target.subtract(realCenter).normalize();
+			Vector3f linear = dir.mult(SnakeConstants.speed);
 			
-			linear.multLocal(SnakeConstants.speed);
+			// 改变按钮的坐标
+			dirControlButton.setLocalTranslation(controlCenter.add(dir.mult(50)));
+
+			// 判断当前方向是在原方向的左侧还是右侧
+			Velocity oldV = ed.getComponent(player, Velocity.class);
+			if (oldV != null) {
+				Vector3f oldLinear = oldV.getLinear();
+				
+				Vector2f vec2 = new Vector2f(oldLinear.x, oldLinear.y);
+				vec2.normalizeLocal();
+				
+				Vector2f vec1 = new Vector2f(dir.x, dir.y);
+				
+				// 判断方向 ：tmp=0没变, tmp>0右转, tmp<0左转
+				float tmp = vec1.determinant(vec2);
+				if (FastMath.abs(tmp) > 0.000001f) {
+					// 计算旋转角度，不要让蛇头骤然大角度旋转
+					float angle = vec1.smallestAngleBetween(vec2);
+					
+					log.info("tmp=" + tmp + " turn " + (tmp>0?"right":"left") + " angle=" + angle/FastMath.DEG_TO_RAD);
+					
+					ed.setComponent(player, new Velocity(linear, SnakeConstants.rotRight));
+				}
+			}
 			
-			ed.setComponent(player, new Velocity(linear));
 		} else {
 			dirControlButton.setLocalTranslation(controlCenter);
 		}
@@ -176,10 +207,7 @@ public class HudState extends BaseAppState implements ActionListener {
 			int kill = 0;
 			killTxt.setText("击杀: " + kill);
 		}
-	}
-	
-	public void updatePlayer() {
-		dirty = true;
+		
 	}
 	
 }

@@ -1,6 +1,5 @@
 package net.jmecn.snake.core;
 
-import com.simsilica.es.EntityData;
 import com.simsilica.es.base.DefaultEntityData;
 
 public class EntityDataService implements Service {

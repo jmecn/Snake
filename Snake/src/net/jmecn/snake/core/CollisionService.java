@@ -1,5 +1,7 @@
 package net.jmecn.snake.core;
 
+import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
 
 import com.jme3.math.Vector3f;
@@ -23,6 +25,16 @@ public class CollisionService implements Service {
 	private EntitySet bodys;
 	private EntitySet heads;
 	private EntitySet foods;
+	
+	private ArrayList<Entity> bodyList;
+	private ArrayList<Entity> foodList;
+	private ArrayList<Entity> headList;
+	
+	public CollisionService() {
+		bodyList = new ArrayList<Entity>();
+		foodList = new ArrayList<Entity>();
+		headList = new ArrayList<Entity>();
+	}
 
 	@Override
 	public void initialize(Game game) {
@@ -41,10 +53,24 @@ public class CollisionService implements Service {
 				new FieldFilter<Type>(Type.class, "value", Type.BODY),
 				Type.class, Position.class, Collision.class);
 
+		
+		foodList.addAll(foods);
+		headList.addAll(heads);
+		bodyList.addAll(bodys);
 	}
 
 	@Override
 	public void terminate(Game game) {
+		// 释放对象
+		foodList.clear();
+		foodList = null;
+		
+		headList.clear();
+		headList = null;
+		
+		bodyList.clear();
+		bodyList = null;
+		
 		foods.release();
 		foods = null;
 		
@@ -53,17 +79,35 @@ public class CollisionService implements Service {
 		
 		bodys.release();
 		bodys = null;
+
 	}
 
 	@Override
 	public void update(long time) {
-		foods.applyChanges();
-		heads.applyChanges();
-		bodys.applyChanges();
+		if (foods.applyChanges()) {
+			foodList.addAll(foods.getAddedEntities());
+			foodList.removeAll(foods.getRemovedEntities());
+		}
+		
+		if (heads.applyChanges()) {
+			headList.addAll(heads.getAddedEntities());
+			headList.removeAll(heads.getRemovedEntities());
+		}
+		
+		if (bodys.applyChanges()) {
+			bodyList.addAll(bodys.getAddedEntities());
+			bodyList.removeAll(bodys.getRemovedEntities());
+		}
+
+		int lenF = foodList.size();
+		int lenH = headList.size();
+		int lenB = bodyList.size();
 
 		// eat food
-		for(Entity food : foods) {
-			for(Entity head : heads) {
+		for(int i=0; i<lenF; i++) {
+			Entity food = foodList.get(i);
+			for(int j=0; j<lenH; j++) {
+				Entity head = headList.get(j);
 				float delta = collision(food, head);
 				if (delta < 0) {
 					Length len = ed.getComponent(head.getId(), Length.class);
@@ -98,8 +142,10 @@ public class CollisionService implements Service {
 		}
 		
 		// head collision with body
-		for(Entity body : bodys) {
-			for(Entity head : heads) {
+		for(int i=0; i<lenB; i++) {
+			Entity body = bodyList.get(i);
+			for(int j=0; j<lenH; j++) {
+				Entity head = headList.get(j);
 				EntityId belongsHead = ed.getComponent(body.getId(), Belongs.class).getParent();
 				
 				// 自身不检测

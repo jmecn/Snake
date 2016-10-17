@@ -1,5 +1,7 @@
 package net.jmecn.snake.core;
 
+import com.jme3.math.Quaternion;
+
 public interface SnakeConstants {
 
 	int width = 1280;
@@ -8,7 +10,14 @@ public interface SnakeConstants {
 	
 	int foodRadius = 3;
 	
+	// 移动速度
 	int speed = 80;
+	int speedup = 160;// 加速后是双倍速度
+	// 右旋速度 90°每秒
+	Quaternion rotRight = new Quaternion(0.0f, 0.0f, -0.38268346f, 0.9238795f);
+	// 左旋速度 90°每秒
+	Quaternion rotLeft = new Quaternion(0.0f, 0.0f, -0.38268346f, 0.9238795f);
+	
 	int snakeBodyRadius = 6;
 	int deadBodyRadius = 5;
 	int snakeMinLength = 30;// 蛇的最短长度
