@@ -49,8 +49,8 @@ public class HudState extends BaseAppState implements ActionListener {
 	private Node guiNode;
 	
 	// 方向控制按钮
-	private Vector3f controlCenter = new Vector3f(150, 150, 0);// 控制器的中心点
-	private Vector3f realCenter = new Vector3f(150, 150, 0);
+	private Vector2f controlCenter = new Vector2f(150, 150);// 控制器的中心点
+	private Vector2f realCenter = new Vector2f(150, 150);
 	private Node dirControlButton;
 	private Node dirControlBackground;
 	
@@ -92,7 +92,6 @@ public class HudState extends BaseAppState implements ActionListener {
 		
 		guiNode.attachChild(hudStatus);
 		hudStatus.move(40, 680, -2);
-		hudStatus.scale(0.5f);
 		
 		// 
 		Picture ctrlBtn = new Picture("ctrlBtn");
@@ -124,7 +123,7 @@ public class HudState extends BaseAppState implements ActionListener {
 		// 根据720分辨率来进行缩放
 		scalar = app.getCamera().getHeight() / 720f;
 		guiNode.scale(scalar);
-		realCenter.multLocal(scalar, scalar, 1f);
+		realCenter.multLocal(scalar);
 		
 		InputManager inputManager = app.getInputManager();
 		inputManager.addMapping(MOVING, new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
@@ -156,39 +155,46 @@ public class HudState extends BaseAppState implements ActionListener {
 		
 		// 方向舵
 		if (isMoving) {
-			Vector2f loc = this.getApplication().getInputManager().getCursorPosition();
-			Vector3f target = new Vector3f(loc.x, loc.y, 0);
+			TempVars tmpVars = TempVars.get();
 			
-			Vector3f dir = target.subtract(realCenter).normalize();
-			Vector3f linear = dir.mult(SnakeConstants.speed);
+			// 根据鼠标位置，计算运动方向
+			Vector2f loc = this.getApplication().getInputManager().getCursorPosition();
+			Vector2f dir = tmpVars.vect2d.set(loc.x, loc.y);
+			dir.subtractLocal(realCenter);
+			dir.normalizeLocal();
+			
 			
 			// 改变按钮的坐标
-			dirControlButton.setLocalTranslation(controlCenter.add(dir.mult(50)));
+			dirControlButton.setLocalTranslation(controlCenter.x+dir.x*50f, controlCenter.y+dir.y*50, -2);
 
 			// 判断当前方向是在原方向的左侧还是右侧
 			Velocity oldV = ed.getComponent(player, Velocity.class);
 			if (oldV != null) {
 				Vector3f oldLinear = oldV.getLinear();
 				
-				Vector2f vec2 = new Vector2f(oldLinear.x, oldLinear.y);
+				Vector2f vec2 = tmpVars.vect2d2.set(oldLinear.x, oldLinear.y);
 				vec2.normalizeLocal();
 				
-				Vector2f vec1 = new Vector2f(dir.x, dir.y);
-				
 				// 判断方向 ：tmp=0没变, tmp>0右转, tmp<0左转
-				float tmp = vec1.determinant(vec2);
+				float tmp = dir.determinant(vec2);
 				if (FastMath.abs(tmp) > 0.000001f) {
-					// 计算旋转角度，不要让蛇头骤然大角度旋转
-					float angle = vec1.smallestAngleBetween(vec2);
+					// TODO 计算旋转角度，不要让蛇头骤然大角度旋转
+					float angle = dir.smallestAngleBetween(vec2);
+					log.info("Snake turn " + (tmp>0?"right":"left") + " angle=" + angle/FastMath.DEG_TO_RAD);
 					
-					log.info("tmp=" + tmp + " turn " + (tmp>0?"right":"left") + " angle=" + angle/FastMath.DEG_TO_RAD);
-					
+					// 线速度
+					Vector3f linear = new Vector3f(
+							dir.x * SnakeConstants.speed, 
+							dir.y * SnakeConstants.speed,
+							0);
 					ed.setComponent(player, new Velocity(linear, SnakeConstants.rotRight));
 				}
 			}
 			
+			
+			tmpVars.release();
 		} else {
-			dirControlButton.setLocalTranslation(controlCenter);
+			dirControlButton.setLocalTranslation(controlCenter.x, controlCenter.y, -2);
 		}
 		
 		// 加速键
