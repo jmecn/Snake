@@ -5,21 +5,22 @@ import java.util.LinkedList;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
-import com.jme3.util.TempVars;
 
 import net.jmecn.snake.core.SnakeConstants;
 
 public class Snake {
 
-	protected String name;
-	protected LinkedList<Entity> bodys;
+	protected String name;// 蛇的名字
+	protected int skinId;// 皮肤
+	protected int length;// 长度
 	
-	protected float collisionRadius;
-	protected int length;
-	protected float speed;
+	protected float collisionRadius;// 碰撞半径
+	protected LinkedList<Entity> bodys;// 蛇身
 	
-	protected boolean isSpeedUp;
-	protected boolean isDead;
+	protected boolean isSpeedUp;// 加速状态
+	protected float speed;// 移动速度
+	
+	protected boolean isDead;// 死亡状态
 	
 	public Snake(String name) {
 		this.name = name;
@@ -29,35 +30,43 @@ public class Snake {
 		speed = SnakeConstants.speed;
 		isSpeedUp = false;
 		isDead = false;
+		skinId = 0;
 	}
 	
 	/**
 	 * 调整蛇身每个位置的运动方向，使其紧随前一截身体。
 	 */
+	Vector3f tmp = new Vector3f();
 	public void follow() {
-		TempVars tmp = TempVars.get();
 		int len = bodys.size();
-		for(int i=len; i>0; i--) {
-			Entity last = bodys.get(len);
-			Entity front = bodys.get(len - 1);
+		if (len < 2)// 只有蛇头，不需要跟随
+			return;
+		
+		for(int i=len-1; i>0; i--) {
+			Entity last = bodys.get(i);
+			Entity front = bodys.get(i - 1);
 			
 			// Follow
 			float maxDist = collisionRadius;
 			
 			Vector3f loc1 = last.getLocation();
 			Vector3f loc2 = front.getLocation();
-	        double dx = loc2.x - loc1.x;
-	        double dy = loc2.y - loc1.y;
-	        double distSquared = dx * dx + dy * dy;
+	        float dx = loc2.x - loc1.x;
+	        float dy = loc2.y - loc1.y;
+	        float distSquared = dx * dx + dy * dy;
 	        
 			if (distSquared > maxDist * maxDist) {
-				Vector3f linear = tmp.vect1;
-				linear.set((float)dx, (float)dy, 0f);
-				linear.normalizeLocal();
-				last.setLinear(linear);
+				
+				// normalize
+				if (distSquared != 1f && distSquared != 0f) {
+					distSquared = 1 / FastMath.sqrt(distSquared);
+					dx *= distSquared;
+					dy *= distSquared;
+				}
+				
+				last.getLinear().set(dx, dy, 0);
 			}
 		}
-		tmp.release();
 	}
 	
 	/**
@@ -72,8 +81,8 @@ public class Snake {
 		}
 		
 		int len = bodys.size();
-		for(int i=len; i>0; i--) {
-			Entity e = bodys.get(len);
+		for(int i=len-1; i>=0; i--) {
+			Entity e = bodys.get(i);
 			
 			Vector3f loc = e.getLocation();
 			Vector3f linear = e.getLinear();

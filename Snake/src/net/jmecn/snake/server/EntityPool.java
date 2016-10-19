@@ -1,6 +1,7 @@
 package net.jmecn.snake.server;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -13,13 +14,13 @@ public class EntityPool {
 
 	static Logger log = Logger.getLogger(EntityPool.class);
 
-	private int capacity = 200; // 对象池的大小
+	private int capacity = 100; // 对象池的大小
 
 	private Entity[] elements = null;
 	private boolean[] inUse = null;
 
 	public EntityPool() {
-		this(200);
+		this(100);
 	}
 
 	/**
@@ -94,7 +95,6 @@ public class EntityPool {
 	/**
 	 * 此函数返回一个对象到对象池中，并把此对象置为空闲。 所有使用对象池获得的对象均应在不使用此对象时返回它。
 	 */
-
 	public void freeEntity(Entity e) {
 		boolean find = false;
 		for (int i = 0; i < capacity; i++) {
@@ -109,6 +109,18 @@ public class EntityPool {
 		if (!find) {
 			log.warn("Entity@" + e.hashCode() + " is not an instance of EntityPool");
 		}
+	}
+
+	/**
+	 * 释放集合中所有的实体
+	 * @param entities
+	 */
+	public void freeAll(List<Entity> entities) {
+		int len = entities.size();
+		for(int i=0; i<len; i++) {
+			freeEntity(entities.get(i));
+		}
+		entities.clear();
 	}
 
 	/**

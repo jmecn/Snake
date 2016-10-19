@@ -1,15 +1,17 @@
 package net.jmecn.snake.server;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
-
 import net.jmecn.snake.core.SnakeConstants;
 import net.jmecn.snake.core.Timer;
 
+import org.apache.log4j.Logger;
+
+import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 
 public class Game {
@@ -36,8 +38,9 @@ public class Game {
 	/**
 	 * 一些临时变量
 	 */
-	private int lenSnake = 0;
-	private int lenFood = 0;
+	private int lenSnake = 0;// 蛇的数量
+	private int lenBody = 0;// 蛇身长度
+	private int lenFood = 0;// 食物的数量
 
 	public Game() {
 		entityPool = new EntityPool();
@@ -54,6 +57,8 @@ public class Game {
 		if (started) {
 			return;
 		}
+		
+		initialize();
 
 		executor.scheduleAtFixedRate(runner, 0, 10, TimeUnit.MILLISECONDS);
 		started = true;
@@ -67,17 +72,8 @@ public class Game {
 			return;
 		}
 
-		/**
-		 * 释放所有内存
-		 */
-		int len = foods.size();
-		for (int i = 0; i < len; i++) {
-			entityPool.freeEntity(foods.get(i));
-		}
-		foods.clear();
-
-		entityPool.release();
-
+		clear();
+		
 		executor.shutdown();
 		started = false;
 		enabled = false;
@@ -87,13 +83,38 @@ public class Game {
 	public void pause() {
 		enabled = !enabled;
 	}
+	
+	protected void initialize() {
+		// 随机刷新200个食物
+		for(int i=0; i<200; i++) {
+			makeNewFood();
+		}
+	}
 
 	public synchronized void update(float tpf) {
+		/**
+		 * 添加食物
+		 */
+		if (addedFoods.size() > 0) {
+			foods.addAll(addedFoods);
+			addedFoods.clear();
+		}
+		
+		/**
+		 * 加入新蛇
+		 */
+		if (addedSnakes.size() > 0) {
+			snakes.addAll(addedSnakes);
+			addedSnakes.clear();
+		}
+		
 		lenSnake = snakes.size();
 		if (lenSnake == 0)
 			return;
 
-		// 使蛇运动
+		/**
+		 * 使蛇运动
+		 */
 		for (int i = 0; i < lenSnake; i++) {
 			Snake s = snakes.get(i);
 			s.follow();
@@ -117,8 +138,55 @@ public class Game {
 		// 碰撞检测
 		hitBody();
 		eatFood();
+		
+		/**
+		 * 移除被吃掉的食物
+		 */
+		if (removedFoods.size() > 0) {
+			foods.removeAll(removedFoods);
+			for(Entity e : removedFoods) {
+				entityPool.freeEntity(e);
+			}
+			removedFoods.clear();
+		}
+		
+		/**
+		 * 移除死蛇
+		 */
+		if (removedSnakes.size() > 0) {
+			snakes.removeAll(removedSnakes);
+			for(Snake s : removedSnakes) {
+				entityPool.freeAll(s.bodys);
+			}
+			removedSnakes.clear();
+		}
+		
 	}
 
+	/**
+	 * 释放所有内存
+	 */
+	protected void clear() {
+		// 清空
+		entityPool.freeAll(foods);
+		foods = null;
+		entityPool.freeAll(addedFoods);
+		addedFoods = null;
+		
+		// 清空蛇
+		for(Snake s:snakes) {
+			entityPool.freeAll(s.bodys);
+		}
+		snakes.clear();
+		
+		for(Snake s:addedSnakes) {
+			entityPool.freeAll(s.bodys);
+		}
+		addedSnakes.clear();
+
+		entityPool.release();
+	}
+	
 	/**
 	 * 蛇头与其他蛇的身体发生碰撞，这条蛇就撞死了。
 	 */
@@ -147,8 +215,9 @@ public class Game {
 					continue;
 
 				hit = false;
+				lenBody = s2.bodys.size();
 				for (int k = 1; // 忽略第一个节点(即蛇头)
-				k < s2.bodys.size(); k++) {
+				k < lenBody; k++) {
 					Entity e = s2.bodys.get(k);
 					Vector3f loc2 = e.getLocation();
 					float r2 = s2.collisionRadius;
@@ -202,21 +271,39 @@ public class Game {
 
 				if (lengthSquare <= threshold) {// 发生了碰撞
 					// 蛇吃到了这个食物
-
 					changeLength(snake, 1);
 					removedFoods.add(food);
-					Entity newFood = makeNewFood();
-					addedFoods.add(newFood);
-
+					makeNewFood();
 				}
 			}
 		}
 	}
 
+	/**
+	 * 创建一条蛇
+	 * @param name
+	 * @return
+	 */
 	public Snake createSnake(String name) {
 		Snake snake = new Snake(name);
 
+		/**
+		 * 找个安全的位置创建蛇头。
+		 */
+		Entity head = createSafeEntity(snake.collisionRadius);
+		snake.bodys.add(head);
+		
+		/**
+		 * 初始化蛇身
+		 */
 		changeLength(snake, SnakeConstants.snakeMinLength);
+		
+		/**
+		 * 设置蛇的皮肤
+		 */
+		
+		addedSnakes.add(snake);
+		
 		return snake;
 	}
 
@@ -227,9 +314,48 @@ public class Game {
 	 *            实体的碰撞半径
 	 * @return
 	 */
-	protected Entity createSaveEntity(float radius) {
+	protected Entity createSafeEntity(float radius) {
 		Entity e = entityPool.newEntity();
 
+		Random rand = FastMath.rand;
+		// 地图高宽
+		float w = SnakeConstants.width - radius * 2;
+		float h = SnakeConstants.height - radius * 2;
+		
+		boolean unsafe = true;
+		outer: while(unsafe) {
+			// 随机生成一组坐标
+			float x = rand.nextFloat() * w + radius;
+			float y = rand.nextFloat() * h + radius;
+			
+			/**
+			 * 避免直接撞在别的蛇身上。
+			 */
+			lenSnake = snakes.size();
+			for(int i=0; i<lenSnake; i++) {
+				Snake s = snakes.get(i);
+				float threshold = s.collisionRadius + radius;
+				threshold *= threshold;
+				lenBody = s.bodys.size();
+				for(int j=0; j<lenBody; j++) {
+					Vector3f loc = s.bodys.get(j).getLocation();
+					float dx = loc.x - x;
+					float dy = loc.y - y;
+					double distanceSquare = dx * dx + dy * dy;
+					if (distanceSquare <= threshold) {
+						break outer;
+					}
+				}
+			}
+			
+			// 安全
+			unsafe = false;
+			
+			e.getLocation().x = x;
+			e.getLocation().y = y;
+		}
+		
+		
 		return e;
 	}
 
@@ -272,7 +398,8 @@ public class Game {
 	}
 
 	protected Entity makeNewFood() {
-		Entity e = entityPool.newEntity();
+		Entity e = createSafeEntity(SnakeConstants.foodRadius);
+		addedFoods.add(e);
 		return e;
 	}
 
@@ -295,8 +422,15 @@ public class Game {
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		Game game = new Game();
 		game.start();
+		
+		game.createSnake("a");
+		game.createSnake("b");
+		game.createSnake("c");
+		
+		Thread.sleep(5000);
+		game.stop();
 	}
 }
