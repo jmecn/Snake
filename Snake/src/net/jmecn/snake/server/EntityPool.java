@@ -1,5 +1,6 @@
 package net.jmecn.snake.server;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -19,8 +20,11 @@ public class EntityPool {
 	private Entity[] elements = null;
 	private boolean[] inUse = null;
 
+	private List<Entity> addedEntities;
+	private List<Entity> removedEntities;
+	
 	public EntityPool() {
-		this(100);
+		createPool(capacity);
 	}
 
 	/**
@@ -29,6 +33,22 @@ public class EntityPool {
 	 * @param capacity
 	 */
 	public EntityPool(int capacity) {
+		createPool(capacity);
+	}
+
+	/**
+	 * 创建对象池
+	 * @param capacity
+	 */
+	public void createPool(int capacity) {
+		if (elements != null) {
+			log.warn("EntityPool already created.");
+			return;
+		}
+		
+		addedEntities = new ArrayList<Entity>();
+		removedEntities = new ArrayList<Entity>();
+		
 		this.capacity = capacity;
 		elements = new Entity[capacity];
 		inUse = new boolean[capacity];
@@ -40,7 +60,24 @@ public class EntityPool {
 
 		log.info("initailize EntityPool, capacity=" + capacity);
 	}
+	
+	/**
+	 * 关闭对象池中所有的对象，并清空对象池。
+	 */
+	public synchronized void releasePool() {
+		for (int i = 0; i < capacity; i++) {
+			if (inUse[i]) {
+				log.warn("Entity@" + i + " still in use:" + elements[i]);
+			}
 
+			elements[i] = null;
+			inUse[i] = false;
+		}
+
+		elements = null;
+		inUse = null;
+	}
+	
 	/**
 	 * 扩容
 	 * 
@@ -83,8 +120,13 @@ public class EntityPool {
 		Entity e = null;
 		for (int i = 0; i < capacity; i++) {
 			if (inUse[i] == false) {
-				inUse[i] = true;
 				e = elements[i];
+				
+				// 防止App端在尚未移除这个实体之前，就被EntityPool干掉了。
+				if (removedEntities.contains(e))
+					continue;
+				inUse[i] = true;
+				addedEntities.add(e);
 				break;
 			}
 		}
@@ -96,11 +138,15 @@ public class EntityPool {
 	 * 此函数返回一个对象到对象池中，并把此对象置为空闲。 所有使用对象池获得的对象均应在不使用此对象时返回它。
 	 */
 	public void freeEntity(Entity e) {
+		log.info("free Entity@" + e.getId());
+		
 		boolean find = false;
 		for (int i = 0; i < capacity; i++) {
 			if (elements[i] == e) {
 				e.reset();
 				inUse[i] = false;
+				removedEntities.add(e);
+				
 				find = true;
 				break;
 			}
@@ -123,20 +169,19 @@ public class EntityPool {
 		entities.clear();
 	}
 
-	/**
-	 * 关闭对象池中所有的对象，并清空对象池。
-	 */
-	public synchronized void release() {
-		for (int i = 0; i < capacity; i++) {
-			if (inUse[i]) {
-				log.warn("Entity@" + i + " still in use:" + elements[i]);
-			}
+	public boolean applyChanges() {
+		return (addedEntities.size() > 0 || removedEntities.size() > 0);
+	}
+	
+	public synchronized List<Entity> getAddedEntities() {
+		return addedEntities;
+	}
+	public synchronized List<Entity> getRemovedEntities() {
+		return removedEntities;
+	}
 
-			elements[i] = null;
-			inUse[i] = false;
-		}
-
-		elements = null;
-		inUse = null;
+	public void freeChanges() {
+		addedEntities.clear();
+		removedEntities.clear();
 	}
 }

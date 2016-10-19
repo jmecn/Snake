@@ -37,7 +37,7 @@ public class MaterialFactory {
 	 * 食物的材质，公用一个纹理，只有七种不同的颜色。
 	 */
 	private Material[] foodMats;
-	protected void initFoodMaterials() {
+	public void initFoodMaterials() {
 		foodMats = new Material[7];
 		
 		Texture texCircle = assetManager.loadTexture("Interface/circle.png");

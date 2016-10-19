@@ -1,6 +1,7 @@
 package net.jmecn.snake.server;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -8,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import net.jmecn.snake.core.SnakeConstants;
 import net.jmecn.snake.core.Timer;
+import net.jmecn.snake.core.Type;
 
 import org.apache.log4j.Logger;
 
@@ -86,7 +88,7 @@ public class Game {
 	
 	protected void initialize() {
 		// 随机刷新200个食物
-		for(int i=0; i<200; i++) {
+		for(int i=0; i<SnakeConstants.foodMinCount; i++) {
 			makeNewFood();
 		}
 	}
@@ -143,10 +145,10 @@ public class Game {
 		 * 移除被吃掉的食物
 		 */
 		if (removedFoods.size() > 0) {
-			foods.removeAll(removedFoods);
 			for(Entity e : removedFoods) {
 				entityPool.freeEntity(e);
 			}
+			foods.removeAll(removedFoods);
 			removedFoods.clear();
 		}
 		
@@ -160,7 +162,6 @@ public class Game {
 			}
 			removedSnakes.clear();
 		}
-		
 	}
 
 	/**
@@ -184,7 +185,7 @@ public class Game {
 		}
 		addedSnakes.clear();
 
-		entityPool.release();
+		entityPool.releasePool();
 	}
 	
 	/**
@@ -223,7 +224,9 @@ public class Game {
 					float r2 = s2.collisionRadius;
 
 					// 平方和
-					float lengthSquare = loc1.x * loc2.x + loc1.y * loc2.y;
+					float dx = loc1.x - loc2.x;
+					float dy = loc1.y - loc2.y;
+					float lengthSquare = dx * dx + dy * dy;
 					float threshold = r1 + r2;
 					threshold *= threshold;
 
@@ -248,16 +251,19 @@ public class Game {
 	 * 蛇头与食物发生碰撞，就说明可以吃掉这个食物
 	 */
 	protected void eatFood() {
+		
 		lenFood = foods.size();
+		
 		for (int i = 0; i < lenSnake; i++) {
 			// 获取蛇头的坐标和碰撞半径
 			Snake snake = snakes.get(i);
 			if (snake.isDead)// 死掉的蛇不会吃食物!
 				continue;
 			
-			Vector3f loc1 = snake.bodys.getFirst().getLocation();
-			float r1 = snake.collisionRadius;
-
+			Entity head = snake.getHead();
+			Vector3f loc1 = head.getLocation();
+			float r1 = head.getRadius();
+			
 			// 获取食物的坐标
 			for (int j = 0; j < lenFood; j++) {
 				Entity food = foods.get(j);
@@ -265,14 +271,19 @@ public class Game {
 				float r2 = SnakeConstants.foodRadius;
 
 				// 平方和
-				float lengthSquare = loc1.x * loc2.x + loc1.y * loc2.y;
+				float dx = loc1.x - loc2.x;
+				float dy = loc1.y - loc2.y;
+				float lengthSquare = dx * dx + dy * dy;
 				float threshold = r1 + r2;
 				threshold *= threshold;
 
 				if (lengthSquare <= threshold) {// 发生了碰撞
 					// 蛇吃到了这个食物
+					log.info(snake.getName() + " eat Entity@" + food.getId() + " @ " + food.getLocation());
+					
 					changeLength(snake, 1);
 					removedFoods.add(food);
+					
 					makeNewFood();
 				}
 			}
@@ -286,25 +297,39 @@ public class Game {
 	 */
 	public Snake createSnake(String name) {
 		Snake snake = new Snake(name);
+		/**
+		 * 设置蛇的皮肤
+		 */
+		snake.skinId = 0;
 
 		/**
 		 * 找个安全的位置创建蛇头。
 		 */
 		Entity head = createSafeEntity(snake.collisionRadius);
-		snake.bodys.add(head);
+		head.setType(Type.HEAD);
+		head.setSkinId(snake.skinId);
 		
+		snake.bodys.add(head);
 		/**
 		 * 初始化蛇身
 		 */
 		changeLength(snake, SnakeConstants.snakeMinLength);
 		
-		/**
-		 * 设置蛇的皮肤
-		 */
 		
 		addedSnakes.add(snake);
 		
 		return snake;
+	}
+	
+	/**
+	 * 断开连接
+	 * @param s
+	 */
+	public void disconnect(Snake s) {
+		entityPool.freeAll(s.bodys);
+		snakes.remove(s);
+		s.isDead = true;
+		s = null;
 	}
 
 	/**
@@ -316,6 +341,7 @@ public class Game {
 	 */
 	protected Entity createSafeEntity(float radius) {
 		Entity e = entityPool.newEntity();
+		e.setRadius(radius);
 
 		Random rand = FastMath.rand;
 		// 地图高宽
@@ -341,7 +367,7 @@ public class Game {
 					Vector3f loc = s.bodys.get(j).getLocation();
 					float dx = loc.x - x;
 					float dy = loc.y - y;
-					double distanceSquare = dx * dx + dy * dy;
+					float distanceSquare = dx * dx + dy * dy;
 					if (distanceSquare <= threshold) {
 						break outer;
 					}
@@ -353,6 +379,8 @@ public class Game {
 			
 			e.getLocation().x = x;
 			e.getLocation().y = y;
+			
+			log.info("Find a safe point for Entity@" + e.getId() + " x=" + x + " y=" + y);
 		}
 		
 		
@@ -381,6 +409,7 @@ public class Game {
 					e.setFacing(last.getFacing());
 					e.setLinear(last.getLinear());
 					e.setSkinId(last.getSkinId());
+					e.setType(Type.BODY);
 
 					snake.bodys.add(e);
 					// TODO addedEntitys.add(e);
@@ -399,6 +428,7 @@ public class Game {
 
 	protected Entity makeNewFood() {
 		Entity e = createSafeEntity(SnakeConstants.foodRadius);
+		e.setType(Type.FOOD);
 		addedFoods.add(e);
 		return e;
 	}
@@ -422,6 +452,14 @@ public class Game {
 		}
 	}
 
+	public ArrayList<Entity> getFoods() {
+		return foods;
+	}
+	
+	public ArrayList<Snake> getSnakes() {
+		return snakes;
+	}
+	
 	public static void main(String[] args) throws Exception {
 		Game game = new Game();
 		game.start();
@@ -430,7 +468,34 @@ public class Game {
 		game.createSnake("b");
 		game.createSnake("c");
 		
-		Thread.sleep(5000);
+		Thread.sleep(120000);
 		game.stop();
+	}
+
+	public boolean applyChanges() {
+		return entityPool.applyChanges();
+	}
+	
+	public void freeChanges() {
+		entityPool.freeChanges();
+	}
+	
+	public List<Entity> getAddedEntities() {
+		return entityPool.getAddedEntities();
+	}
+	
+	private ArrayList<Entity> changedEntities = new ArrayList<Entity>();
+	public List<Entity> getChangedEntities() {
+		changedEntities.clear();
+		changedEntities.addAll(foods);
+		for(Snake s : snakes) {
+			changedEntities.addAll(s.bodys);
+		}
+		
+		return changedEntities;
+	}
+	
+	public List<Entity> getRemovedEntities() {
+		return entityPool.getRemovedEntities();
 	}
 }

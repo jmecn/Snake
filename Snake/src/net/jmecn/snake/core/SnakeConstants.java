@@ -8,6 +8,9 @@ public interface SnakeConstants {
 	int height = 720;
 	int UNIT = 8;
 	
+	int foodMinCount = 200;// 食物的最少数量
+	int snakeMinLength = 30;// 蛇的最短长度
+	
 	int foodRadius = 3;
 	
 	// 移动速度
@@ -20,7 +23,6 @@ public interface SnakeConstants {
 	
 	int snakeBodyRadius = 6;
 	int deadBodyRadius = 5;
-	int snakeMinLength = 30;// 蛇的最短长度
 	int snakeBodyGrow = 5;
 	
 	int foodMovingDistance = 181;// 食物在靠近蛇头的时候会自动吸附

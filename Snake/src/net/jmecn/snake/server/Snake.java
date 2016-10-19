@@ -1,15 +1,20 @@
 package net.jmecn.snake.server;
 
 import java.util.LinkedList;
+import java.util.List;
+
+import net.jmecn.snake.core.SnakeConstants;
+
+import org.apache.log4j.Logger;
 
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 
-import net.jmecn.snake.core.SnakeConstants;
-
 public class Snake {
 
+	static Logger log = Logger.getLogger(Snake.class);
+	
 	protected String name;// 蛇的名字
 	protected int skinId;// 皮肤
 	protected int length;// 长度
@@ -65,6 +70,8 @@ public class Snake {
 				}
 				
 				last.getLinear().set(dx, dy, 0);
+			} else {
+				last.getLinear().set(0, 0, 0);
 			}
 		}
 	}
@@ -140,5 +147,33 @@ public class Snake {
 		result.set(0, 0, z, w);
 
 		return result;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public Entity getHead() {
+		if (bodys == null && bodys.size() == 0){
+			log.info("木有蛇头了!");
+			return null;
+		}
+		return bodys.getFirst();
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	public int getLength() {
+		return length;
+	}
+
+	public boolean isDead() {
+		return isDead;
+	}
+
+	public List<Entity> getBodys() {
+		return bodys;
 	}
 }
