@@ -15,17 +15,17 @@ public class Snake {
 
 	static Logger log = Logger.getLogger(Snake.class);
 	
-	protected String name;// 蛇的名字
-	protected int skinId;// 皮肤
-	protected int length;// 长度
+	public String name;// 蛇的名字
+	public int skinId;// 皮肤
+	public int length;// 长度
 	
-	protected float collisionRadius;// 碰撞半径
-	protected LinkedList<Entity> bodys;// 蛇身
+	public float collisionRadius;// 碰撞半径
+	public LinkedList<Entity> bodys;// 蛇身
 	
 	protected boolean isSpeedUp;// 加速状态
 	protected float speed;// 移动速度
 	
-	protected boolean isDead;// 死亡状态
+	public boolean isDead;// 死亡状态
 	
 	public Snake(String name) {
 		this.name = name;
