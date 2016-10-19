@@ -180,7 +180,7 @@ public class HudState extends BaseAppState implements ActionListener {
 				if (FastMath.abs(tmp) > 0.000001f) {
 					// TODO 计算旋转角度，不要让蛇头骤然大角度旋转
 					float angle = dir.smallestAngleBetween(vec2);
-					log.info("Snake turn " + (tmp>0?"right":"left") + " angle=" + angle/FastMath.DEG_TO_RAD);
+					boolean right = tmp > 0;// 向右转还是向左转
 					
 					// 线速度
 					Vector3f linear = new Vector3f(

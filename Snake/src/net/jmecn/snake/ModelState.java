@@ -16,7 +16,6 @@ import com.jme3.app.state.BaseAppState;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
-import com.jme3.scene.BatchNode;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.simsilica.es.Entity;
@@ -38,7 +37,6 @@ public class ModelState extends BaseAppState {
 	private final Map<EntityId, Spatial> models;
 	private ModelFactory modelFactory;
 
-	BatchNode batched;
 	public ModelState() {
 		rootNode = new Node("VisualNode");
 		models = new HashMap<EntityId, Spatial>();

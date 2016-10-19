@@ -1,7 +1,7 @@
 package net.jmecn.snake.core;
 
 /**
- * ��ʱ��
+ * 计时器
  * @author yanmaoyuan
  *
  */
@@ -20,7 +20,7 @@ public class Timer {
 	}
 	
 	/**
-	 * ���¼�ʱ��
+	 * 更新时间
 	 */
 	public void update() {
 		timePerFrame = getTime() - previousTime;
@@ -28,7 +28,7 @@ public class Timer {
 	}
 	
 	/**
-	 * ��ȡû֡ʱ����
+	 * 每帧经过的时间
 	 * @return
 	 */
 	public long getTimePerFrame() {
@@ -36,7 +36,7 @@ public class Timer {
 	}
 	
 	/**
-	 * ���ÿ��֡��
+	 * FPS
 	 * @return
 	 */
 	public float getFramePerSecond() {
@@ -44,7 +44,7 @@ public class Timer {
 	}
 	
 	/**
-	 * ���ü�ʱ��
+	 * 重置定时器
 	 */
 	public void reset() {
 		startTime = System.nanoTime();

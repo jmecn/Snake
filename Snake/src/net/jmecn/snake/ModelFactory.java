@@ -8,9 +8,7 @@ import net.jmecn.snake.core.Type;
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState.BlendMode;
-import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector2f;
-import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
@@ -28,10 +26,15 @@ public class ModelFactory {
 
 	private AssetManager assetManager;
 
+	private MaterialFactory materialFactory;
+	
 	public ModelFactory(AssetManager assetManager) {
 		this.assetManager = assetManager;
+		this.materialFactory = new MaterialFactory(assetManager);
+		
+		materialFactory.initFoodMaterials();
 	}
-
+	
 	/**
 	 * @param name
 	 * @return
@@ -40,6 +43,11 @@ public class ModelFactory {
 		return assetManager.loadModel(name);
 	}
 	
+	/**
+	 * 
+	 * @param name
+	 * @return
+	 */
 	public Texture createTexture(String name) {
 		return assetManager.loadTexture(name);
 	}
@@ -61,18 +69,19 @@ public class ModelFactory {
 			if (type.getSkin() == -1) {
 				return createFood(radius);
 			} else {
-				return createBody(radius, Skins.BEE.body);
+				int skin = type.getSkin();
+				return createWreck(radius, Skin.values()[skin-1]);
 			}
 		}
 		case Type.HEAD: {
 			float radius = collision == null ? SnakeConstants.snakeBodyRadius : collision.getRadius();
 			int skin = type.getSkin();
-			return createBody(radius, Skins.BEE.head, Skins.BEE.headScale);
+			return createHead(radius, Skin.values()[skin-1]);
 		}
 		case Type.BODY: {
 			float radius = collision == null ? SnakeConstants.snakeBodyRadius : collision.getRadius();
 			int skin = type.getSkin();
-			return createBody(radius, Skins.BEE.body, Skins.BEE.bodyScale);
+			return createBody(radius, Skin.values()[skin-1]);
 		}
 		default:
 			return null;
@@ -81,13 +90,10 @@ public class ModelFactory {
 	
 	public Spatial createFood(float radius) {
 		Quad mesh = new Quad(radius*2, radius*2);
+		
 		Geometry geom = new Geometry("Food", mesh);
 
-		Material mat = getUnshadedMaterial();
-		mat.setTexture("ColorMap", createTexture("Interface/circle.png"));
-		mat.setColor("Color", ColorRGBA.randomColor());
-		
-		geom.setMaterial(mat);
+		geom.setMaterial(materialFactory.getRandomFoodMaterail());
 		geom.setQueueBucket(Bucket.Translucent);
 		
 		Node node = new Node("food");
@@ -96,24 +102,56 @@ public class ModelFactory {
 		return node;
 	}
 	
-	public Spatial createBody(float radius, String imgName) {
-		return createBody(radius, imgName, Vector3f.UNIT_XYZ);
-	}
-	
-	public Spatial createBody(float radius, String imgName, Vector3f scale) {
-		float width = radius * 2 * scale.x;
-		float height = radius * 2 * scale.y;
+	public Spatial createHead(float radius, Skin skin) {
+		float width = radius * 2 * skin.headXScale;
+		float height = radius * 2 * skin.headYScale;
 		Quad mesh = new Quad(width, height);
 		Geometry geom = new Geometry("body", mesh);
 
-		Material mat = getUnshadedMaterial();
-		mat.setTexture("ColorMap", createTexture("Interface/Skin/" + imgName));
+		Material mat = materialFactory.getHeadMat(skin);
+		geom.setMaterial(mat);
+		geom.setQueueBucket(Bucket.Translucent);
+		
+		Node node = new Node("head");
+		node.attachChild(geom);
+		geom.setLocalTranslation(-radius * skin.headXScale, -radius * skin.headYScale, 0);
+		return node;
+	}
+	
+	public Spatial createBody(float radius, Skin skin) {
+		float width = radius * 2;
+		float height = radius * 2;
+		Quad mesh = new Quad(width, height);
+		Geometry geom = new Geometry("body", mesh);
+
+		Material mat = materialFactory.getBodyMat(skin, 1);
 		geom.setMaterial(mat);
 		geom.setQueueBucket(Bucket.Translucent);
 		
 		Node node = new Node("body");
 		node.attachChild(geom);
-		geom.setLocalTranslation(-radius * scale.x, -radius * scale.y, 0);
+		geom.setLocalTranslation(-radius, -radius, 0);
+		return node;
+	}
+	
+	public Spatial createWreck(float radius, Skin skin) {
+		float width = radius * 2;
+		float height = radius * 2;
+		Quad mesh = new Quad(width, height);
+		Geometry geom = new Geometry("body", mesh);
+
+		Material mat;
+		if (skin.wreck == 0) {// 没有残骸则使用身体的材质
+			mat = materialFactory.getWreckMat(skin, 1);
+		} else {
+			mat = materialFactory.getBodyMat(skin, 1);
+		}
+		geom.setMaterial(mat);
+		geom.setQueueBucket(Bucket.Translucent);
+		
+		Node node = new Node("body");
+		node.attachChild(geom);
+		geom.setLocalTranslation(-radius, -radius, 0);
 		return node;
 	}
 	
