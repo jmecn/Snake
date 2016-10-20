@@ -1,5 +1,10 @@
 package net.jmecn.snake;
 
+/**
+ * 皮肤的定义
+ * @author yanmaoyuan
+ *
+ */
 public enum Skin {
 	SKIN_1(1, 1, 2, 1, 1.828f, 1.25f),// 蜜蜂
 	SKIN_2(2, 2, 0, 0),// 小黄人

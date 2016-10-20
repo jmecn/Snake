@@ -5,22 +5,17 @@ import net.jmecn.snake.core.SnakeConstants;
 import net.jmecn.snake.core.Tail;
 
 import com.jme3.app.SimpleApplication;
-import com.jme3.app.StatsAppState;
 import com.jme3.math.Vector3f;
 import com.simsilica.es.EntityId;
 
 public class Main extends SimpleApplication {
 
-
 	public Main() {
-		super(new StatsAppState());
+		super(new MusicState(), new MainMenuState());
 	}
 	
 	@Override
 	public void simpleInitApp() {
-		stateManager.attachAll(new MusicState(), new MainMenuState());
-		
-		//startSingleGame();
 	}
 	
 	public void startSingleGame() {

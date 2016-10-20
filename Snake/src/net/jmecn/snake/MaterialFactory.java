@@ -101,8 +101,6 @@ public class MaterialFactory {
 		Material mat = getUnshadedMaterial();
 		mat.setTexture("ColorMap", assetManager.loadTexture(res));
 		
-		log.info("创建材质: " + res);
-		
 		// 存入缓存
 		skinKeys[length] = name;
 		skinMats[length] = mat;
