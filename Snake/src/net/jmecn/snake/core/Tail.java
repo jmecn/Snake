@@ -6,6 +6,8 @@ import com.simsilica.es.EntityId;
 public class Tail implements EntityComponent {
 	private EntityId id;
 
+	public Tail() {}
+	
 	public Tail(EntityId id) {
 		this.id = id;
 	}

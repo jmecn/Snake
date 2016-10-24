@@ -6,6 +6,10 @@ import com.simsilica.es.EntityId;
 public class Belongs implements EntityComponent {
 	private EntityId parent;
 
+	public Belongs() {
+		parent = new EntityId();
+	}
+	
 	public Belongs(EntityId parent) {
 		this.parent = parent;
 	}

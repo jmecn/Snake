@@ -7,6 +7,8 @@ public class Follow implements EntityComponent {
 
 	private EntityId parent;
 	private float dist;
+	
+	public Follow() {};
 
 	public Follow(EntityId parent, float dist) {
 		this.parent = parent;

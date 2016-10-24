@@ -119,7 +119,10 @@ public class MainMenuState extends BaseAppState {
 			future = null;
 			log.info("done in " + time + "s");
 			getStateManager().detach(this);
-			((Main)getApplication()).startSingleGame();
+			
+			
+			//((Main)getApplication()).startSingleGame();
+			((Main)getApplication()).startNetGame();
 		}
 	}
 }

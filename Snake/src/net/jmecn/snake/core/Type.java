@@ -13,6 +13,11 @@ public class Type implements EntityComponent {
 	private int skin;
 	private int value;
 
+	public Type() {
+		this.value = 0;
+		this.skin = -1;
+	}
+	
 	public Type(int value) {
 		this.value = value;
 		this.skin = -1;

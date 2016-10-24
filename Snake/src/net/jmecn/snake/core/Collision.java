@@ -6,8 +6,11 @@ public class Collision implements EntityComponent {
 
 	private float radius;
 
+	public Collision() {
+		this.radius = SnakeConstants.foodRadius;
+	}
+	
 	public Collision(float radius) {
-		super();
 		this.radius = radius;
 	}
 

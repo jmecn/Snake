@@ -5,6 +5,7 @@ import net.jmecn.snake.core.Belongs;
 import net.jmecn.snake.core.Collision;
 import net.jmecn.snake.core.Dead;
 import net.jmecn.snake.core.Decay;
+import net.jmecn.snake.core.EntityFactory;
 import net.jmecn.snake.core.Follow;
 import net.jmecn.snake.core.Game;
 import net.jmecn.snake.core.Length;
@@ -31,6 +32,15 @@ public class GameServer {
 		game.start();
 		
 		DefaultEntityData ed = (DefaultEntityData) game.getEntityData();
+		
+		
+		EntityFactory factory = game.getFactory();
+		
+		for (int i = 0; i < 200; i++) {
+			factory.createFood();
+		}
+		
+		
 		Server server = Network.createServer("My Game Server", 1, 9942, 9942);
 		server.getServices().addService(
 				new EntityDataHostedService(

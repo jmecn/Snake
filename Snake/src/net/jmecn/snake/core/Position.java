@@ -9,6 +9,11 @@ public class Position implements EntityComponent {
 	private Vector3f location;
 	private Quaternion facing;
 
+	public Position() {
+		this.location = new Vector3f();
+		this.facing = new Quaternion();
+	}
+	
 	public Position(Vector3f location) {
 		this.location = location;
 		this.facing = new Quaternion();

@@ -6,6 +6,8 @@ public class Length implements EntityComponent {
 
 	private int value;
 
+	public Length() {};
+	
 	public Length(int value) {
 		this.value = value;
 	}

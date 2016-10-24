@@ -1,7 +1,7 @@
 package net.jmecn.snake.core;
 
 /**
- * ��Ϸ����ӿ�
+ * 游戏服务接口
  * @author yanmaoyuan
  *
  */
