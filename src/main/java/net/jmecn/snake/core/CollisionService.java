@@ -2,7 +2,8 @@ package net.jmecn.snake.core;
 
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jme3.math.Vector3f;
 import com.simsilica.es.Entity;
@@ -17,7 +18,7 @@ import com.simsilica.es.filter.FieldFilter;
  * 
  */
 public class CollisionService implements Service {
-	static Logger log = Logger.getLogger(CollisionService.class);
+	static Logger log = LoggerFactory.getLogger(CollisionService.class);
 	
 	private Game game = null;
 	
@@ -116,15 +117,15 @@ public class CollisionService implements Service {
 					
 					if (value % SnakeConstants.snakeBodyGrow == 0) {
 						Tail tail = ed.getComponent(head.getId(), Tail.class);
-						log.info(tail);
+						log.info("{}", tail);
 						
 						Position p = ed.getComponent(tail.getId(), Position.class);
-						log.info(p);
+						log.info("{}", p);
 						
 						int skin = head.get(Type.class).getSkin();
 						EntityId newTail = game.getFactory().createBody(p.getLocation(), skin, head.getId(), tail.getId());
 						ed.setComponent(head.getId(), new Tail(newTail));
-						log.info("create new tail" + newTail + " with skin: " + skin);
+						log.info("create new tail{} with skin: {}", newTail, skin);
 					}
 					
 					ed.removeEntity(food.getId());

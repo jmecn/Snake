@@ -1,6 +1,7 @@
 package net.jmecn.snake.core;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
@@ -11,7 +12,7 @@ import com.simsilica.es.EntitySet;
 
 public class MovementService implements Service {
 
-	static Logger log = Logger.getLogger(MovementService.class);
+	static Logger log = LoggerFactory.getLogger(MovementService.class);
 
 	private EntityData ed;
 	private EntitySet entities;

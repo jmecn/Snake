@@ -1,6 +1,7 @@
 package net.jmecn.snake;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
@@ -16,7 +17,7 @@ import com.jme3.texture.Texture;
  */
 public class MaterialFactory {
 	
-	static Logger log = Logger.getLogger(MaterialFactory.class);
+	static Logger log = LoggerFactory.getLogger(MaterialFactory.class);
 
 	private AssetManager assetManager;
 	

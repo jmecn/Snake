@@ -47,8 +47,7 @@ import com.jme3.audio.AudioData.DataType;
  *
  *  @author    Paul Speed
  */
-public class MusicState extends BaseAppState
-{
+public class MusicState extends BaseAppState {
     private String song;
     private AudioNode music;
     private String playing;

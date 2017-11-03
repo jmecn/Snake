@@ -1,6 +1,7 @@
 package net.jmecn.snake.core;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
@@ -9,7 +10,7 @@ import com.simsilica.es.EntityId;
 
 public class EntityFactory {
 
-	static Logger log = Logger.getLogger(EntityFactory.class);
+	static Logger log = LoggerFactory.getLogger(EntityFactory.class);
 	
 	EntityData ed;
 	

@@ -4,7 +4,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
@@ -18,7 +19,7 @@ import com.jme3.ui.Picture;
 
 public class MainMenuState extends BaseAppState {
 
-	static Logger log = Logger.getLogger(MainMenuState.class);
+	static Logger log = LoggerFactory.getLogger(MainMenuState.class);
 	
 	private Picture slash;
 	
@@ -121,8 +122,7 @@ public class MainMenuState extends BaseAppState {
 			getStateManager().detach(this);
 			
 			
-			//((Main)getApplication()).startSingleGame();
-			((Main)getApplication()).startNetGame();
+			((Main)getApplication()).startSingleGame();
 		}
 	}
 }

@@ -1,6 +1,7 @@
 package net.jmecn.snake.core;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jme3.math.Vector3f;
 import com.simsilica.es.Entity;
@@ -9,7 +10,7 @@ import com.simsilica.es.EntitySet;
 import com.simsilica.es.filter.FieldFilter;
 
 public class DeadService implements Service {
-	static Logger log = Logger.getLogger(DeadService.class);
+	static Logger log = LoggerFactory.getLogger(DeadService.class);
 	private Game game;
 	private EntityData ed;
 	private EntitySet entities;

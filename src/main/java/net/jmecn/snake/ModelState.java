@@ -4,11 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import net.jmecn.snake.core.Collision;
-import net.jmecn.snake.core.Position;
-import net.jmecn.snake.core.Type;
-
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
@@ -23,9 +20,13 @@ import com.simsilica.es.EntityData;
 import com.simsilica.es.EntityId;
 import com.simsilica.es.EntitySet;
 
+import net.jmecn.snake.core.Collision;
+import net.jmecn.snake.core.Position;
+import net.jmecn.snake.core.Type;
+
 public class ModelState extends BaseAppState {
 
-	static Logger log = Logger.getLogger(ModelState.class);
+	static Logger log = LoggerFactory.getLogger(ModelState.class);
 	
 	private SimpleApplication simpleApp;
 

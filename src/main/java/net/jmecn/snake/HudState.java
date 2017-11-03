@@ -1,11 +1,13 @@
 package net.jmecn.snake;
 
-import org.apache.log4j.Logger;
 
 import net.jmecn.snake.core.Length;
 import net.jmecn.snake.core.Position;
 import net.jmecn.snake.core.SnakeConstants;
 import net.jmecn.snake.core.Velocity;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
@@ -32,7 +34,7 @@ import com.simsilica.es.EntityId;
 
 public class HudState extends BaseAppState implements ActionListener {
 
-	static Logger log = Logger.getLogger(HudState.class);
+	static Logger log = LoggerFactory.getLogger(HudState.class);
 	
 	public final static String MOVING = "moving";
 	public final static String SPEEDUP = "speedup";
